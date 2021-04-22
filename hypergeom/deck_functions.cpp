@@ -9,7 +9,7 @@
 #include <iostream>
 #include <cstdlib>
 
-// Constructor for the deck class
+ // Constructor for the deck class
 deck::deck(unsigned long popSize, unsigned long popSuccesses, unsigned long sampleSize, unsigned long desiredSuccesses)
 {
     // Checks if the numbers they entered allow for a valid Deck
@@ -27,7 +27,7 @@ deck::deck(unsigned long popSize, unsigned long popSuccesses, unsigned long samp
             popFailures = popSize - popSuccesses;
             sampleFailures = sampleSize - desiredSuccesses;
 
-            exactChance = probability(this->desiredSuccesses) * ncr(sampleSize, desiredSuccesses); // Chance of getting exactly desired successes
+            exactChance = probability(this->desiredSuccesses); // Chance of getting exactly desired successes
             orGreaterInclusiveChance = orGreater(exactChance); // Chance of getting desired successes or greater
             orLessInclusiveChance = orLess(exactChance); // Chance of getting desired successes or less
         }
@@ -83,7 +83,7 @@ const unsigned long long deck::ncr(unsigned long n, unsigned long r) const
         unsigned long long top = 1; // top holds the value of n * (n - 1) * (n - 2) ...
         unsigned long long bottom = 1; // bottom holds the value of r * (r - 1) * (r - 2) ...
 
-        if (r != 0)
+        if (r)
         {
             /*
              * Because this only loops until r = 0, we only calculate the first r numbers of the factorial
@@ -92,7 +92,7 @@ const unsigned long long deck::ncr(unsigned long n, unsigned long r) const
              * This is how we calculate nCr with the simplified equation
              * The top is n * (n - 1) * (n - 2) * ... * (n - r + 1) and the bottom is r!
              */
-            while (r > 0)
+            while (r)
             {
                 top *= n;
                 bottom *= r;
@@ -125,31 +125,33 @@ const unsigned long long deck::ncr(unsigned long n, unsigned long r) const
 }
 
 // Calculates the hypergeometric probability
-const double deck::probability(const unsigned long currentDesiredSuccesses) const
+const double deck::probability(unsigned long currentDesiredSuccesses) const
 {
     double popSize = this->popSize;
     double popSuccesses = this->popSuccesses;
-    double desiredSuccesses = currentDesiredSuccesses;
     double popFailures = this->popFailures;
     double sampleFailures = this->sampleSize - currentDesiredSuccesses;
 
     double prob = 1;
+    unsigned long long combination = ncr(this->sampleSize, currentDesiredSuccesses);
 
-    for (int i = 0; i < desiredSuccesses; i++)
+    // Calculate the probability from the successes
+    for (currentDesiredSuccesses; currentDesiredSuccesses > 0; currentDesiredSuccesses--)
     {
         prob *= (popSuccesses / popSize);
         popSuccesses--;
         popSize--;
     }
 
-    for (int i = 0; i < sampleFailures; i++)
+    // Calculate the probability from the failures
+    for (sampleFailures; sampleFailures > 0; sampleFailures--)
     {
         prob *= (popFailures / popSize);
         popFailures--;
         popSize--;
     }
 
-    return prob;
+    return prob * combination;
 }
 
 // Calculates the probability of n or greater successes
@@ -160,7 +162,7 @@ double deck::orGreater(double exactChance)
     while (tempDesiredSuccesses < sampleSize)
     {
         tempDesiredSuccesses++;
-        exactChance += (probability(tempDesiredSuccesses) * ncr(sampleSize, tempDesiredSuccesses));
+        exactChance += probability(tempDesiredSuccesses);
     }
     return exactChance;
 }
@@ -173,7 +175,7 @@ double deck::orLess(double exactChance)
     while (tempDesiredSuccesses > 0)
     {
         tempDesiredSuccesses--;
-        exactChance += (probability(tempDesiredSuccesses) * ncr(sampleSize, tempDesiredSuccesses));
+        exactChance += probability(tempDesiredSuccesses);
     }
     return exactChance;
 }

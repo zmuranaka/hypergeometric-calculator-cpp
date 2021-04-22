@@ -26,7 +26,7 @@ private:
     // Member function prototypes
     const unsigned long long gcd(unsigned long long givenNumber1, unsigned long long givenNumber2) const;
     const unsigned long long ncr(unsigned long n, unsigned long r) const;
-    const double probability(const unsigned long currentDesiredSuccesses) const;
+    const double probability(unsigned long currentDesiredSuccesses) const;
     double orGreater(double exactChance);
     double orLess(double exactChance);
 
