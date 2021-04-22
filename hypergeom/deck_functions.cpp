@@ -51,7 +51,7 @@ const unsigned long long deck::gcd(unsigned long long givenNumber1, unsigned lon
 {
     unsigned long greatestCommonDenominator = 1; // The minimum GCD of any two numbers is 1
 
-    for (unsigned int i = 1; i <= givenNumber1 && i <= givenNumber2; i++)
+    for (unsigned i = 1; i <= givenNumber1 && i <= givenNumber2; i++)
     {
         if (givenNumber1 % i == 0 && givenNumber2 % i == 0) // Checks if i is factor of both integers using modulus division
             greatestCommonDenominator = i;
@@ -131,38 +131,25 @@ const double deck::probability(const unsigned long currentDesiredSuccesses) cons
     double popSuccesses = this->popSuccesses;
     double desiredSuccesses = currentDesiredSuccesses;
     double popFailures = this->popFailures;
-    double sampleFailures = sampleSize - currentDesiredSuccesses;
+    double sampleFailures = this->sampleSize - currentDesiredSuccesses;
 
-    double w = 1;
+    double prob = 1;
 
     for (int i = 0; i < desiredSuccesses; i++)
     {
-        w = (popSuccesses / popSize) * w;
+        prob *= (popSuccesses / popSize);
         popSuccesses--;
         popSize--;
     }
 
     for (int i = 0; i < sampleFailures; i++)
     {
-        w = (popFailures / popSize) * w;
+        prob *= (popFailures / popSize);
         popFailures--;
         popSize--;
     }
 
-    return w;
-}
-
-// Calculates the factorial of sampleSize
-const unsigned long long deck::factorial(unsigned long sampleSize) const
-{
-    // This is an unsigned long long because factorials are never negative and can get exceedingly large
-    // Even using an unsigned long long, the maximum number that can be correctly calculated is 20!
-    // This is because 21! exceeds the range of even an unsigned long long
-    unsigned long long fact = 1;
-
-    for (unsigned int i = 1; i <= sampleSize; i++) fact *= i;
-
-    return fact;
+    return prob;
 }
 
 // Calculates the probability of n or greater successes
