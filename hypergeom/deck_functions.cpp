@@ -27,18 +27,13 @@ deck::deck(unsigned long popSize, unsigned long popSuccesses, unsigned long samp
             popFailures = popSize - popSuccesses;
             sampleFailures = sampleSize - desiredSuccesses;
 
-            dpopSize = popSize;
-            dpopSuccesses = popSuccesses;
-            ddesiredSuccesses = desiredSuccesses;
-            dpopFailures = popFailures;
-            dsampleFailures = sampleFailures;
-
-            combination = ncr(sampleSize, desiredSuccesses);
+            exactChance = probability(this->desiredSuccesses) * ncr(sampleSize, desiredSuccesses); // Chance of getting exactly desired successes
+            orGreaterInclusiveChance = orGreater(exactChance); // Chance of getting desired successes or greater
+            orLessInclusiveChance = orLess(exactChance); // Chance of getting desired successes or less
         }
         // It is possible to construct a valid Deck that still results in a divide-by-zero error
         catch (const std::exception& ex)
         {
-
             std::cerr << ex.what() << std::endl;
             std::cerr << "The numbers you entered cause a divide-by-zero error. Try again." << std::endl;
             exit(1);
@@ -49,22 +44,6 @@ deck::deck(unsigned long popSize, unsigned long popSuccesses, unsigned long samp
         std::cerr << "The numbers you entered are not a valid hypergeometric distribution. Try again." << std::endl;
         exit(1);
     }
-}
-
-// Constructs a new deck that's a copy of deck d
-deck::deck(const deck& d)
-    : popSize(d.popSize), popSuccesses(d.popSuccesses), sampleSize(d.sampleSize), desiredSuccesses(d.desiredSuccesses)
-{
-    popFailures = d.popFailures;
-    sampleFailures = d.sampleFailures;
-
-    dpopSize = popSize;
-    dpopSuccesses = popSuccesses;
-    ddesiredSuccesses = desiredSuccesses;
-    dpopFailures = popFailures;
-    dsampleFailures = sampleFailures;
-
-    combination = ncr(sampleSize, desiredSuccesses);
 }
 
 // Calculates the greatest common denominator between two numbers
@@ -79,28 +58,6 @@ const unsigned long long deck::gcd(unsigned long long givenNumber1, unsigned lon
     }
 
     return greatestCommonDenominator;
-}
-
-// Calculates the hypergeometric probability
-const double deck::probability(double popSize, double popSuccesses, double desiredSuccesses, double popFailures, double sampleFailures) const
-{
-    double w = 1;
-
-    for (int i = 0; i < desiredSuccesses; i++)
-    {
-        w = (popSuccesses / popSize) * w;
-        popSuccesses--;
-        popSize--;
-    }
-
-    for (int i = 0; i < sampleFailures; i++)
-    {
-        w = (popFailures / popSize) * w;
-        popFailures--;
-        popSize--;
-    }
-
-    return w;
 }
 
 /*
@@ -167,6 +124,34 @@ const unsigned long long deck::ncr(unsigned long n, unsigned long r) const
     }
 }
 
+// Calculates the hypergeometric probability
+const double deck::probability(const unsigned long currentDesiredSuccesses) const
+{
+    double popSize = this->popSize;
+    double popSuccesses = this->popSuccesses;
+    double desiredSuccesses = currentDesiredSuccesses;
+    double popFailures = this->popFailures;
+    double sampleFailures = sampleSize - currentDesiredSuccesses;
+
+    double w = 1;
+
+    for (int i = 0; i < desiredSuccesses; i++)
+    {
+        w = (popSuccesses / popSize) * w;
+        popSuccesses--;
+        popSize--;
+    }
+
+    for (int i = 0; i < sampleFailures; i++)
+    {
+        w = (popFailures / popSize) * w;
+        popFailures--;
+        popSize--;
+    }
+
+    return w;
+}
+
 // Calculates the factorial of sampleSize
 const unsigned long long deck::factorial(unsigned long sampleSize) const
 {
@@ -183,15 +168,12 @@ const unsigned long long deck::factorial(unsigned long sampleSize) const
 // Calculates the probability of n or greater successes
 double deck::orGreater(double exactChance)
 {
-    for (unsigned long i = desiredSuccesses; i < sampleSize; i++)
+    unsigned long tempDesiredSuccesses = this->desiredSuccesses;
+
+    while (tempDesiredSuccesses < sampleSize)
     {
-        ddesiredSuccesses++;
-        desiredSuccesses++;
-        combination = ncr(sampleSize, desiredSuccesses);
-        dsampleFailures = sampleSize - desiredSuccesses;
-        double iChance = probability(dpopSize, dpopSuccesses, ddesiredSuccesses, dpopFailures, dsampleFailures);
-        iChance *= combination;
-        exactChance += iChance;
+        tempDesiredSuccesses++;
+        exactChance += (probability(tempDesiredSuccesses) * ncr(sampleSize, tempDesiredSuccesses));
     }
     return exactChance;
 }
@@ -199,15 +181,22 @@ double deck::orGreater(double exactChance)
 // Calculates the probability of n or less successes
 double deck::orLess(double exactChance)
 {
-    for (unsigned long i = desiredSuccesses; i > 0; i--)
+    unsigned long tempDesiredSuccesses = this->desiredSuccesses;
+
+    while (tempDesiredSuccesses > 0)
     {
-        ddesiredSuccesses--;
-        desiredSuccesses--;
-        combination = ncr(sampleSize, desiredSuccesses);
-        dsampleFailures = sampleSize - desiredSuccesses;
-        double iChance = probability(dpopSize, dpopSuccesses, ddesiredSuccesses, dpopFailures, dsampleFailures);
-        iChance *= combination;
-        exactChance += iChance;
+        tempDesiredSuccesses--;
+        exactChance += (probability(tempDesiredSuccesses) * ncr(sampleSize, tempDesiredSuccesses));
     }
     return exactChance;
+}
+
+// Prints out the probabilities to the ostream
+const void deck::print(std::ostream& out) const
+{
+    out << "Chance of exactly desired successes: " << exactChance << std::endl;
+    out << "Chance of less than desired successes: " << orLessInclusiveChance - exactChance << std::endl;
+    out << "Chance of desired successes or less: " << orLessInclusiveChance << std::endl;
+    out << "Chance of greater than desired successes: " << orGreaterInclusiveChance - exactChance << std::endl;
+    out << "Chance of desired successes or greater: " << orGreaterInclusiveChance << std::endl;
 }
