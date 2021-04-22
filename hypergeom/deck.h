@@ -24,7 +24,7 @@ private:
     double orLessInclusiveChance;
 
     // Member function prototypes
-    const unsigned long long gcd(unsigned long long givenNumber1, unsigned long long givenNumber2) const;
+    const unsigned long long gcd(const unsigned long long givenNumber1, const unsigned long long givenNumber2) const;
     const unsigned long long ncr(unsigned long n, unsigned long r) const;
     const double probability(unsigned long currentDesiredSuccesses) const;
     double orGreater(double exactChance);
@@ -32,7 +32,7 @@ private:
 
 public:
     // Constructor prototype
-    deck(unsigned long popSize, unsigned long popSuccesses, unsigned long sampleSize, unsigned long desiredSuccesses);
+    deck(const unsigned long popSize, const unsigned long popSuccesses, const unsigned long sampleSize, const unsigned long desiredSuccesses);
 
     const void print(std::ostream& out) const;
 };

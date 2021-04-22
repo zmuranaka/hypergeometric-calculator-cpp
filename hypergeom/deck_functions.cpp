@@ -9,8 +9,8 @@
 #include <iostream>
 #include <cstdlib>
 
- // Constructor for the deck class
-deck::deck(unsigned long popSize, unsigned long popSuccesses, unsigned long sampleSize, unsigned long desiredSuccesses)
+// Constructor for the deck class
+deck::deck(const unsigned long popSize, const unsigned long popSuccesses, const unsigned long sampleSize, const unsigned long desiredSuccesses)
 {
     // Checks if the numbers they entered allow for a valid Deck
     if (popSize >= popSuccesses && popSize >= sampleSize && popSize >= desiredSuccesses
@@ -47,7 +47,7 @@ deck::deck(unsigned long popSize, unsigned long popSuccesses, unsigned long samp
 }
 
 // Calculates the greatest common denominator between two numbers
-const unsigned long long deck::gcd(unsigned long long givenNumber1, unsigned long long givenNumber2) const
+const unsigned long long deck::gcd(const unsigned long long givenNumber1, const unsigned long long givenNumber2) const
 {
     unsigned long greatestCommonDenominator = 1; // The minimum GCD of any two numbers is 1
 
