@@ -82,7 +82,7 @@ const unsigned long long deck::gcd(unsigned long long givenNumber1, unsigned lon
 }
 
 // Calculates the hypergeometric probability
-double deck::probability(double popSize, double popSuccesses, double desiredSuccesses, double popFailures, double sampleFailures)
+const double deck::probability(double popSize, double popSuccesses, double desiredSuccesses, double popFailures, double sampleFailures) const
 {
     double w = 1;
 
@@ -110,7 +110,7 @@ double deck::probability(double popSize, double popSuccesses, double desiredSucc
  * This method calculates nCr using this simplified equation
  * n = sampleSize and r = desiredSuccesses
  */
-unsigned long long deck::ncr(unsigned long n, unsigned long r)
+const unsigned long long deck::ncr(unsigned long n, unsigned long r) const
 {
     /*
      * The combination of n and r is equal to the combination of n and (n - r)
@@ -168,16 +168,14 @@ unsigned long long deck::ncr(unsigned long n, unsigned long r)
 }
 
 // Calculates the factorial of sampleSize
-unsigned long long deck::factorial(unsigned long sampleSize)
+const unsigned long long deck::factorial(unsigned long sampleSize) const
 {
     // This is an unsigned long long because factorials are never negative and can get exceedingly large
     // Even using an unsigned long long, the maximum number that can be correctly calculated is 20!
     // This is because 21! exceeds the range of even an unsigned long long
     unsigned long long fact = 1;
 
-    for (unsigned int i = 1; i <= sampleSize; i++) {
-        fact = fact * i;
-    }
+    for (unsigned int i = 1; i <= sampleSize; i++) fact *= i;
 
     return fact;
 }

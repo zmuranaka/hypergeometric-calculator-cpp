@@ -39,23 +39,17 @@ public:
     // Function prototypes for the member functions
     deck(unsigned long popSize, unsigned long popSuccesses, unsigned long sampleSize, unsigned long desiredSuccesses);
     deck(const deck& d);
-    double probability(double popSize, double popSuccesses, double desiredSuccesses, double popFailures, double sampleFailures);
-    unsigned long long ncr(unsigned long n, unsigned long r);
-    unsigned long long factorial(unsigned long sampleSize);
+    const double probability(double popSize, double popSuccesses, double desiredSuccesses, double popFailures, double sampleFailures) const;
+    const unsigned long long ncr(unsigned long n, unsigned long r) const;
+    const unsigned long long factorial(unsigned long sampleSize) const;
     double orGreater(double exactChance);
     double orLess(double exactChance);
 
     // The following are accessor functions so the Driver program can access the private data
-    const unsigned long getpopSize() const { return popSize; }
     const double getdpopSize() const { return dpopSize; }
-    const unsigned long getpopSuccesses() const { return popSuccesses; }
     const double getdpopSuccesses() const { return dpopSuccesses; }
-    const unsigned long getsampleSize() const { return sampleSize; }
-    const unsigned long getdesiredSuccesses() const { return desiredSuccesses; }
     const double getddesiredSuccesses() const { return ddesiredSuccesses; }
-    const unsigned long getpopFailures() const { return popFailures; } 
     const double getdpopFailures() const { return dpopFailures; }
-    const unsigned long getsampleFailures() const { return sampleFailures; }
     const double getdsampleFailures() const { return dsampleFailures; }
     const unsigned long long getcombination() const { return combination; }
 };
