@@ -12,7 +12,7 @@
 // Constructor for the deck class
 deck::deck(const unsigned long popSize, const unsigned long popSuccesses, const unsigned long sampleSize, const unsigned long desiredSuccesses)
 {
-    // Checks if the numbers they entered allow for a valid Deck
+    // Checks if the numbers they entered allow for a valid deck
     if (popSize >= popSuccesses && popSize >= sampleSize && popSize >= desiredSuccesses
         && popSuccesses >= desiredSuccesses && sampleSize >= desiredSuccesses
         && popSize >= 0 && popSuccesses >= 0 && sampleSize >= 0 && desiredSuccesses >= 0)
@@ -23,15 +23,13 @@ deck::deck(const unsigned long popSize, const unsigned long popSuccesses, const 
             this->popSuccesses = popSuccesses;
             this->sampleSize = sampleSize;
             this->desiredSuccesses = desiredSuccesses;
+            this->popFailures = popSize - popSuccesses;
 
-            popFailures = popSize - popSuccesses;
-            sampleFailures = sampleSize - desiredSuccesses;
-
-            exactChance = probability(this->desiredSuccesses); // Chance of getting exactly desired successes
-            orGreaterInclusiveChance = orGreater(exactChance); // Chance of getting desired successes or greater
-            orLessInclusiveChance = orLess(exactChance); // Chance of getting desired successes or less
+            this->exactChance = probability(this->desiredSuccesses); // Chance of getting exactly desired successes
+            this->orGreaterInclusiveChance = orGreater(exactChance); // Chance of getting desired successes or greater
+            this->orLessInclusiveChance = orLess(exactChance); // Chance of getting desired successes or less
         }
-        // It is possible to construct a valid Deck that still results in a divide-by-zero error
+        // It is possible to construct a valid deck that still results in a divide-by-zero error
         catch (const std::exception& ex)
         {
             std::cerr << ex.what() << std::endl;
@@ -130,25 +128,27 @@ const double deck::probability(unsigned long currentDesiredSuccesses) const
     double popSize = this->popSize;
     double popSuccesses = this->popSuccesses;
     double popFailures = this->popFailures;
-    double sampleFailures = this->sampleSize - currentDesiredSuccesses;
+    unsigned long sampleFailures = this->sampleSize - currentDesiredSuccesses;
 
     double prob = 1;
     unsigned long long combination = ncr(this->sampleSize, currentDesiredSuccesses);
 
     // Calculate the probability from the successes
-    for (currentDesiredSuccesses; currentDesiredSuccesses > 0; currentDesiredSuccesses--)
+    while (currentDesiredSuccesses > 0)
     {
         prob *= (popSuccesses / popSize);
         popSuccesses--;
         popSize--;
+        currentDesiredSuccesses--;
     }
 
     // Calculate the probability from the failures
-    for (sampleFailures; sampleFailures > 0; sampleFailures--)
+    while (sampleFailures > 0)
     {
         prob *= (popFailures / popSize);
         popFailures--;
         popSize--;
+        sampleFailures--;
     }
 
     return prob * combination;
@@ -159,7 +159,7 @@ double deck::orGreater(double exactChance)
 {
     unsigned long tempDesiredSuccesses = this->desiredSuccesses;
 
-    while (tempDesiredSuccesses < sampleSize)
+    while (tempDesiredSuccesses < this->sampleSize)
     {
         tempDesiredSuccesses++;
         exactChance += probability(tempDesiredSuccesses);
@@ -183,9 +183,9 @@ double deck::orLess(double exactChance)
 // Prints out the probabilities to the ostream
 const void deck::print(std::ostream& out) const
 {
-    out << "Chance of exactly desired successes: " << exactChance << std::endl;
-    out << "Chance of less than desired successes: " << orLessInclusiveChance - exactChance << std::endl;
-    out << "Chance of desired successes or less: " << orLessInclusiveChance << std::endl;
-    out << "Chance of greater than desired successes: " << orGreaterInclusiveChance - exactChance << std::endl;
-    out << "Chance of desired successes or greater: " << orGreaterInclusiveChance << std::endl;
+    out << "Chance of exactly desired successes: " << this->exactChance << std::endl;
+    out << "Chance of less than desired successes: " << this->orLessInclusiveChance - this->exactChance << std::endl;
+    out << "Chance of desired successes or less: " << this->orLessInclusiveChance << std::endl;
+    out << "Chance of greater than desired successes: " << this->orGreaterInclusiveChance - this->exactChance << std::endl;
+    out << "Chance of desired successes or greater: " << this->orGreaterInclusiveChance << std::endl;
 }

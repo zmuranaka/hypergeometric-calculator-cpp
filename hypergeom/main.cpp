@@ -18,8 +18,8 @@ int main()
     const unsigned long desiredSuccesses = validData("Desired successes: ");
 
     // Construct the deck object and print the results
-    deck orGreaterDeck(popSize, popSuccesses, sampleSize, desiredSuccesses);
-    orGreaterDeck.print(std::cout);
+    deck myDeck(popSize, popSuccesses, sampleSize, desiredSuccesses);
+    myDeck.print(std::cout);
 
     return 0;
 }
@@ -36,6 +36,7 @@ const unsigned long validData(const char* prompt)
     {
         std::cin.clear();
         std::cin.ignore(10000, '\n'); // Take out 1000 characters from the buffer but stop if it encounters a newline
+        std::cerr << "There was an error processing your input. Try again." << std::endl;
         return validData(prompt);
     }
     return potentialData;

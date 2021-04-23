@@ -18,7 +18,6 @@ private:
     unsigned long sampleSize; // The size of the sample you take from the entire population
     unsigned long desiredSuccesses; // The amount of successes you are looking for from your sample
     unsigned long popFailures; // Calculates the amount of failures throughout the entire population
-    unsigned long sampleFailures; // Calculates the number of failures in your sample assuming you get exactly the desired number of successes
     double exactChance;
     double orGreaterInclusiveChance;
     double orLessInclusiveChance;
